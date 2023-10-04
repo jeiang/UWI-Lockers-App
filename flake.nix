@@ -92,8 +92,19 @@
             alejandra.enable = true;
             deadnix.enable = true;
             gofumpt.enable = true;
-            prettier = {
+            prettier = let
+              pretter-pkg = pkgs.writeShellApplication {
+                name = "prettier";
+                runtimeInputs = with pkgs; [
+                  nodePackages.prettier
+                ];
+                text = ''
+                  exec prettier --write "$@"
+                '';
+              };
+            in {
               enable = true;
+              package = pretter-pkg;
               settings = {
                 arrowParens = "always";
                 endOfLine = "lf";
