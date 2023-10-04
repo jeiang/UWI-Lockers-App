@@ -1,5 +1,6 @@
 !assets/
 !bun.lockb
+!.eslintignore
 !.eslintrc.cjs
 !index.html
 !package.json
