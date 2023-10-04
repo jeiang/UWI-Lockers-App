@@ -29,7 +29,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r := mux.NewRouter()
+	r := mux.NewRouter().StrictSlash(true)
 	// The static preact app will be served under `/`.
 	http.Handle("/", http.FileServer(http.FS(distFS)))
 	handlers.RegisterApiRoutes(r)
