@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/charmbracelet/log"
 	"github.com/gorilla/mux"
 )
 
@@ -14,6 +15,7 @@ func RegisterApiRoutes(r *mux.Router) {
 	s.PathPrefix("/").Methods(http.MethodGet).HandlerFunc(handleApiIndex)
 }
 
-func handleApiIndex(w http.ResponseWriter, _ *http.Request) {
+func handleApiIndex(w http.ResponseWriter, r *http.Request) {
+	log.Debug("received a request", "ipaddr", r.RemoteAddr)
 	fmt.Fprintf(w, "Hello, from api!")
 }

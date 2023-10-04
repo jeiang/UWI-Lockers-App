@@ -16,14 +16,16 @@ type Config struct {
 }
 
 var _rawFlags struct {
-	addr    string
-	help    bool
-	port    int
-	version bool
+	addr     string
+	help     bool
+	logLevel string
+	port     int
+	version  bool
 }
 
 func init() {
 	flag.StringVar(&_rawFlags.addr, "addr", "", "set the local address of the server that data will be served from")
+	flag.StringVar(&_rawFlags.logLevel, "level", "", "how much to log")
 	flag.BoolVar(&_rawFlags.help, "help", false, "get help")
 	flag.IntVar(&_rawFlags.port, "port", 80, "the port to run the server on")
 	flag.BoolVar(&_rawFlags.version, "version", false, "get the current version of the server")
@@ -53,6 +55,18 @@ func loadConfig() Config {
 	conf := Config{
 		addr: fmt.Sprintf("%s:%d", _rawFlags.addr, _rawFlags.port),
 	}
+
+	var logLevel log.Level
+	if _rawFlags.logLevel != "" {
+		logLevel = log.ParseLevel(_rawFlags.logLevel)
+	} else {
+		lv, ok := os.LookupEnv("LOG")
+		if ok {
+			logLevel = log.ParseLevel(lv)
+		}
+	}
+	logger := log.NewWithOptions(os.Stdout, log.Options{Level: logLevel})
+	log.SetDefault(logger)
 
 	return conf
 }
