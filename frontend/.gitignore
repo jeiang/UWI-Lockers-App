@@ -1,0 +1,9 @@
+!assets/
+!bun.lockb
+!.eslintrc.cjs
+!index.html
+!package.json
+!public/
+!src/
+!tsconfig.json
+!vite.config.ts

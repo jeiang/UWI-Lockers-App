@@ -1,0 +1,20 @@
+*
+
+# Except
+!**/.gitignore
+
+!frontend/
+!README.md
+!TODO.md
+
+## Nix
+!.envrc
+!default.nix
+!flake.lock
+!flake.nix
+!shell.nix
+
+## Go
+!config.go
+!go.mod
+!main.go
