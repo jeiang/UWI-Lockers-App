@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/log"
 
 	"aidanpinard.co/lockers-app/handlers"
+	"aidanpinard.co/lockers-app/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -30,6 +31,7 @@ func main() {
 	}
 
 	r := mux.NewRouter().StrictSlash(true)
+	r.Use(middleware.Log)
 	// The static preact app will be served under `/`.
 	http.Handle("/", http.FileServer(http.FS(distFS)))
 	handlers.RegisterApiRoutes(r)

@@ -19,3 +19,4 @@
 !go.mod
 !main.go
 !handlers/
+!middleware/
