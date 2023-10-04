@@ -11,17 +11,21 @@ import (
 // TODO: add a config file option and load from it
 
 type Config struct {
-	port    int
-	version bool
-	help    bool
+	addr string
 }
 
-var _conf Config
+var _rawFlags struct {
+	addr    string
+	help    bool
+	port    int
+	version bool
+}
 
 func init() {
-	flag.BoolVar(&_conf.help, "help", false, "get help")
-	flag.IntVar(&_conf.port, "port", 8080, "the port to run the server on")
-	flag.BoolVar(&_conf.version, "version", false, "get the current version of the server")
+	flag.StringVar(&_rawFlags.addr, "addr", "", "set the local address of the server that data will be served from")
+	flag.BoolVar(&_rawFlags.help, "help", false, "get help")
+	flag.IntVar(&_rawFlags.port, "port", 80, "the port to run the server on")
+	flag.BoolVar(&_rawFlags.version, "version", false, "get the current version of the server")
 }
 
 func loadConfig() Config {
@@ -30,10 +34,10 @@ func loadConfig() Config {
 		log.Fatalf("Unable to read build info for package")
 	}
 	flag.Parse()
-	if _conf.help {
+	if _rawFlags.help {
 		flag.PrintDefaults()
 		os.Exit(0)
-	} else if _conf.version {
+	} else if _rawFlags.version {
 		fmt.Printf("%s %s (%s) build opts: [", info.Main.Path, info.Main.Version, info.GoVersion)
 		for i, setting := range info.Settings {
 			if i != 0 {
@@ -44,5 +48,10 @@ func loadConfig() Config {
 		fmt.Print("]\n")
 		os.Exit(0)
 	}
-	return _conf
+
+	conf := Config{
+		addr: fmt.Sprintf("%s:%d", _rawFlags.addr, _rawFlags.port),
+	}
+
+	return conf
 }

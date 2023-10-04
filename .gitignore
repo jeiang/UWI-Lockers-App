@@ -18,3 +18,4 @@
 !config.go
 !go.mod
 !main.go
+!handlers/

@@ -2,14 +2,21 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
+	"sync"
+	"time"
+
+	"aidanpinard.co/lockers-app/handlers"
+	"github.com/gorilla/mux"
 )
 
 //go:embed all:frontend/dist
 var preactFS embed.FS
+
+// Keep the main thread from dying until server processes are done
+var wg sync.WaitGroup
 
 func main() {
 	// setup cache path flag
@@ -21,22 +28,27 @@ func main() {
 		log.Fatal(err)
 	}
 
+	r := mux.NewRouter()
 	// The static preact app will be served under `/`.
 	http.Handle("/", http.FileServer(http.FS(distFS)))
-	// The API will be served under `/api`.
-	http.HandleFunc("/api/v1/", handleAPI)
+	handlers.RegisterApiRoutes(r)
 
-	// Start HTTP server at port.
-	log.Printf("Starting HTTP server at http://localhost:%d ...\n", config.port)
-	err = http.ListenAndServe(
-		fmt.Sprintf(":%d", config.port),
-		nil,
-	)
-	if err != nil {
-		log.Fatal(err)
+	server := &http.Server{
+		Handler:      r,
+		Addr:         config.addr,
+		WriteTimeout: 15 * time.Second,
 	}
-}
 
-func handleAPI(w http.ResponseWriter, _ *http.Request) {
-	fmt.Fprintf(w, "Hello, from api!")
+	// TODO: tls
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		log.Printf("starting server on http://%s\n", config.addr)
+		err := server.ListenAndServe()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	wg.Wait()
 }
