@@ -3,10 +3,11 @@ package main
 import (
 	"embed"
 	"io/fs"
-	"log"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/charmbracelet/log"
 
 	"aidanpinard.co/lockers-app/handlers"
 	"github.com/gorilla/mux"
@@ -43,7 +44,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		log.Printf("starting server on http://%s\n", config.addr)
+		log.Infof("starting server on http://%s\n", config.addr)
 		err := server.ListenAndServe()
 		if err != nil {
 			log.Fatal(err)

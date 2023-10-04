@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"runtime/debug"
+
+	"github.com/charmbracelet/log"
 )
 
 // TODO: add a config file option and load from it

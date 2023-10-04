@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+
+	"github.com/charmbracelet/log"
 )
 
-func loginHandler(w http.ResponseWriter, _ *http.Request) {
-	log.Printf("loging??\n")
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debug("received a request", "ipaddr", r.RemoteAddr)
 	fmt.Fprintf(w, "Hello, from login!")
 }
