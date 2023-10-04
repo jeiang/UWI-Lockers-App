@@ -91,8 +91,21 @@
           programs = {
             alejandra.enable = true;
             deadnix.enable = true;
-            prettier.enable = true;
             gofumpt.enable = true;
+            prettier = {
+              enable = true;
+              settings = {
+                arrowParens = "always";
+                endOfLine = "lf";
+                jsxSingleQuote = false;
+                printWidth = 80;
+                semi = true;
+                singleAttributePerLine = true;
+                singleQuote = false;
+                tabWidth = 2;
+                trailingComma = "es5";
+              };
+            };
           };
         };
       };
