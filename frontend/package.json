@@ -10,8 +10,13 @@
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0 --report-unused-disable-directives --fix"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
+    "framer-motion": "^10.16.4",
     "preact": "^10.13.1",
     "preact-iso": "^2.3.1",
     "preact-render-to-string": "^6.2.2",

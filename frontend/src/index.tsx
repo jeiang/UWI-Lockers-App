@@ -4,18 +4,22 @@ import { LocationProvider, Router, Route } from 'preact-iso';
 import { Header } from '@/components/Header.jsx';
 import { Home } from '@/pages/Home/index.jsx';
 import { NotFound } from '@/pages/_404.jsx';
+import { ChakraProvider } from '@chakra-ui/react';
+import { theme } from '@/theme';
 
 export function App() {
 	return (
-		<LocationProvider>
-			<Header />
-			<main>
-				<Router>
-					<Route path="/" component={Home} />
-					<Route default component={NotFound} />
-				</Router>
-			</main>
-		</LocationProvider>
+		<ChakraProvider theme={theme}>
+			<LocationProvider>
+				<Header />
+				<main>
+					<Router>
+						<Route path="/" component={Home} />
+						<Route default component={NotFound} />
+					</Router>
+				</main>
+			</LocationProvider>
+		</ChakraProvider>
 	);
 }
 
