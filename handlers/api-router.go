@@ -12,7 +12,8 @@ func RegisterApiRoutes(r *mux.Router) {
 	// TODO: register some routes
 	// The API will be served under `/api/v1`.
 	s := r.PathPrefix("/api/v1").Subrouter()
-	s.PathPrefix("/").Methods(http.MethodGet).HandlerFunc(handleApiIndex)
+	s.Path("/").Methods(http.MethodGet).HandlerFunc(handleApiIndex)
+	s.Path("/login").Methods(http.MethodPost).HandlerFunc(loginHandler)
 }
 
 func handleApiIndex(w http.ResponseWriter, r *http.Request) {
