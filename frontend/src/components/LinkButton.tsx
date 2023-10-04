@@ -10,7 +10,6 @@ export const LinkButton = ({ navigate, to, from, children, ...props }: LinkButto
   <Button 
     onClick={() => navigate(to)} 
     isActive={to == from} 
-    colorScheme='purple' 
     cursor={to == from ? "pointer" : "default"} 
     {...props}
   >

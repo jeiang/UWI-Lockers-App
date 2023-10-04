@@ -5,11 +5,12 @@ import { Header } from '@/components/Header.jsx';
 import { Home } from '@/pages/Home/index.jsx';
 import { NotFound } from '@/pages/_404.jsx';
 import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from '@/theme';
+import { theme, FontsProvider } from '@/theme';
 
 export function App() {
 	return (
 		<ChakraProvider theme={theme}>
+			<FontsProvider />
 			<LocationProvider>
 				<Header />
 				<main>
