@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS users (
+  uid SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  passwordHash BYTEA NOT NULL
+);

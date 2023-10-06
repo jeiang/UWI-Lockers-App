@@ -3,6 +3,12 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     devenv.url = "github:cachix/devenv";
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -41,8 +47,17 @@
       perSystem = {
         config,
         pkgs,
+        inputs',
         ...
       }: {
+        # normal package generated is busted rn
+        apps.devenv-up = {
+          type = "app";
+          program = pkgs.writeShellScriptBin "devenv-up" ''
+            ${config.devenv.shells.default.procfileScript}
+          '';
+        };
+
         # TODO: containers
         devenv.shells.default = {
           enterShell = ''
@@ -66,6 +81,7 @@
             commitizen
             config.treefmt.build.wrapper
             nodePackages.typescript-language-server
+            inputs'.devenv.packages.default
           ];
 
           languages.nix.enable = true;
@@ -84,6 +100,20 @@
           pre-commit.settings.eslint.extensions = "\.[jt]sx?$$";
 
           difftastic.enable = true;
+
+          env = {
+            PGDATABASE = "locker-app";
+          };
+
+          services.postgres = {
+            enable = true;
+            initialDatabases = [
+              {
+                name = "locker-app";
+                schema = ./schemas/locker-app.sql;
+              }
+            ];
+          };
         };
 
         treefmt = {
