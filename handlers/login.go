@@ -2,28 +2,39 @@ package handlers
 
 import (
 	"context"
+	"crypto/ed25519"
 	"crypto/rand"
-	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	cache "github.com/patrickmn/go-cache"
 	"golang.org/x/crypto/bcrypt"
 )
 
 const (
 	// used to fill time on the check
 	sample_hash = "$2a$14$eNKVCPjXz48hg7E6qAbupO/Vv/0L5LVg0wE/.ycLKDrZ.4BOnPkyS"
+	Expiration  = 2 * time.Hour
+	Issuer      = "aidanp"
 )
 
+var PrivateKey ed25519.PrivateKey
+
+func init() {
+	seed := make([]byte, ed25519.SeedSize)
+	_, err := rand.Read(seed)
+	if err != nil {
+		log.Fatal(err)
+	}
+	PrivateKey = ed25519.NewKeyFromSeed(seed)
+}
+
 type LoginHandler struct {
-	DB         *pgxpool.Pool
-	TokenCache *cache.Cache
+	DB *pgxpool.Pool
 }
 
 type Auth struct {
@@ -32,7 +43,8 @@ type Auth struct {
 
 func (lh *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Debug("received a request", "ipaddr", r.RemoteAddr, "form values", r.Form)
-	// TODO: sanitize usernaem
+	// TODO: sanitize username
+	// TODO: check data type
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
@@ -67,25 +79,19 @@ func (lh *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Generate an auth token user CSPRNG
-	bytes := make([]byte, 128)
-	_, err = rand.Read(bytes)
+	currentTime := time.Now()
+	token := jwt.NewWithClaims(&jwt.SigningMethodEd25519{}, jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(currentTime.Add(Expiration)),
+		Issuer:    Issuer,
+		IssuedAt:  jwt.NewNumericDate(currentTime),
+		NotBefore: jwt.NewNumericDate(currentTime),
+	})
+	tokenString, err := token.SignedString(PrivateKey)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	token := hex.EncodeToString(bytes)
-	auth := Auth{Token: token}
-
-	lh.TokenCache.Set(auth.Token, username, 2*time.Hour)
-
-	js, err := json.Marshal(auth)
-	if err != nil {
-		log.Error("error occurred while trying to marshal the bearer token to json", "err", err)
+		log.Error("error occurred while trying to sign the jwt", "err", err, "user", username)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	w.Write([]byte(tokenString))
 }
